@@ -20,7 +20,7 @@ body-parser
 $ sudo apt-get install node
 ```
 
-```terminal
+```
 $ sudo apt-get install npm
 ```
 
