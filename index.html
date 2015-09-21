@@ -1,0 +1,261 @@
+<!--
+Gerenciador de despesas de treinamento
+
+Na Zup cada funcionário tem uma verba de treinamento de R$3000,00 por ano que pode ser usada para participação em eventos (incluindo as despesas com viagem), treinamentos presenciais e online.
+
+A equipe do financeiro não tem um bom controle sobre esses gastos com treinamento. Não se sabe ao certo quanto cada um já gastou, quanto a empresa está gastando por mês, quem ainda não usou a verba anual, entre outros problemas.
+
+Uma API REST inicial já foi construida e agora você irá criar uma interface gráfica usando HTML5 e JavaScript.
+
+A página inicial deverá ser um dashboard com alguns gráficos. Nessa versão inicial temos apenas um gráfico que deve mostrar o total gasto em cada mês de um determinado ano.
+
+Outra funcionalidade que deve estar presente na primeira versão é uma listagem de funcionários. Ao selecionar um funcionário o detalhes desse funcionário (hoje temos apenas o nome) juntamente com as despesas do funcionário no ano deve ser apresentadas.
+
+Por fim, deve ser possível cadastrar uma nova despesa para o funcionário. 
+
+A API REST inicial está disponível no API Gateway da Zup. Para ter acesso acesse https://zup.developer.zup.me e faça seu cadastro. Depois de logado, para conseguir realizar chamadas para a API você deve criar uma aplicação, e em cada requisição é preciso passar os headers com a Chave de Acesso e a Chave da Aplicação. Na página da aplicação você terá acesso à documentação dos serviços e tambéma a uma interface para realizar chamadas de teste.
+
+O que deve ser feito:
+
+    Construir uma interface gráfica utilizando HTML5 e Javascript
+    O código-fonte deve ser disponibilizado na sua conta do Github, em um repositório com o nome xy-inc, juntamente com as instruções para execução e testes da aplicação (arquivo README)
+
+
+Considerações importantes:
+
+    Você pode utilizar qualquer tecnologia que julgar necessário
+    Serão avaliados: organização do código, simplicidade da solução (KISS), conhecimentos da linguagem/framework utilizado, cobertura de testes, extensibilidade, manutenibilidade.
+
+
+-->
+
+<!DOCTYPE html>
+<html lang="en" ng-app="app_el">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Controle de Gastos</title>
+
+    <!-- Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/index.css" rel="stylesheet" >
+	
+    <script src="lib/angular.min.js" ></script>
+	<script src="lib/angular-locale_pt-br.js"></script>
+	<script src="lib/angular-input-masks.js"></script>
+	<script src="lib/chart/Chart.js"></script>
+	<script src="lib/chart/angular-chart.min.js"></script>
+	<script src="lib/chart/angular-chart.css"></script>
+	
+	<script src="js/app.js"></script>
+	<script src="js/values/values.js"></script>
+	<script src="js/factorys/funcionario_factory.js"></script>
+	<script src="js/factorys/treinamento_factory.js"></script>
+
+</head>
+<body>
+	
+	<img id="background_img" src="img/credit-card-cash-payments.png" >
+	
+	<!-- MENU -->	
+	<nav class="navbar navbar-default navbar-fixed-top">
+	  <div class="container-fluid" style="background:#27ae60 none repeat scroll 0 0">
+		<div class="navbar-header">
+			
+		  <a class="navbar-brand" href="#">
+			<img alt="Brand" src="http://www.zup.com.br/images/logo.svg">
+		  </a>
+
+		</div>
+		 <div id="navbar" class="navbar-collapse collapse ">
+			<ul class="nav navbar-nav navbar-right">
+			</ul>  
+		</div> 
+	  </div>
+	</nav>
+	
+	<!-- MENU -->
+	
+	<br/><br/><br/><br/>
+	
+	<!-- CONTENT -->
+	<div class="container-fluid">
+		
+		<div class="row" ng-controller="ctrl_funcionario">
+
+
+			<div class="col-md-12 pull-center" id="searchyear">
+				<div class="col-md-4" ></div>
+				<div class="col-md-4" >
+					<form class=" form-inline ">
+					  <div class="form-group">
+						<label for="ano" >Digite o ano aqui</label>
+						<input type="number" class="form-control" id="ano" ng-model="anodigitado" placeholder="2015" value="2015">
+					  </div>
+					  <button type="button" ng-click="buscarGastoAno(anodigitado)" class="btn btn-default">Buscar</button>
+					</form>
+				</div>
+				<div class="col-md-4" ></div>
+				
+			</div>
+
+			<hr/>
+			
+            <div class="col-md-12"  ng-show="!grafico">
+              <button type="button" id="btn_dashboard" ng-click="visualizarDashboard()" class="pull-right btn btn-success">Dashboard</button>
+            </div>
+			
+			
+			<div ng-show="grafico" >
+                
+                 <div class="col-md-12" >
+                    <button type="button" ng-click="visualizarDashboard()"  class="pull-right btn btn-success ">Funcionarios</button>
+                </div>
+                
+                <div class="col-md-2"></div>
+                
+                <div class="col-md-8" >
+					
+					<div class="col-md-6">
+						<h3>Gasto Anual</h3>
+					</div>
+					
+                    <canvas id="bar" class="chart chart-bar" chart-data="data" chart-labels="labels"  chart-legend="true" chart-series="series" chart-click="onClick"></canvas>     
+                </div>
+                
+                <div class="col-md-2" ></div>
+                 
+            </div>
+			
+			<div ng-show="!grafico" >
+				<div class="col-md-4 ">
+
+					<div class="panel panel-default panel-info">
+					  <div class="panel-heading">Selecione na lista um funcionario</div>
+					  <div class="panel-body">
+							<form class="form">
+								<div class="input">
+								  <input ng-model="nome_funcionario" type="text" class="form-control search"  placeholder="Digite aqui o nome do Funcionario">
+								</div>
+							</form>	
+							<hr/>
+							<div class="container_scroll">
+								<table class="table table-hover">
+									<thead>
+										<tr><th>Nome</th></tr>
+									</thead>    
+									<tbody>
+										<tr ng-repeat="funcionario in funcionarios |  filter:nome_funcionario">
+											<td ng-click="buscarInformacoesTreinamentosFuncionario(funcionario)" >{{ funcionario.name }}</td>
+										</tr>
+									</tbody>
+								</table>    
+							</div>
+					  </div>
+					</div>
+				</div>
+				
+				<div class="col-md-8">
+                         <div class="col-md-12" >
+                             <div ng-show="message.error">
+                                   <div class="alert alert-{{ message.type }}" role="alert">{{ message.text }}</div>
+                             </div>
+                         </div>
+                     	<div ng-show="codigo_cliente_selecionado" class="col-md-8" >
+                        	<button type="button" ng-click="cadastrarTreinamento()" ng-disabled="!codigo_cliente_selecionado" ng-show="listar" class="pull-right btn btn-success btn_action_form">Adicionar Treinamento</button>
+                        	<button type="button" ng-disabled="false" ng-click="cadastrarTreinamento()" ng-show="!listar" class="pull-right btn btn-info btn_action_form">Listar Treinamento</button>
+                     
+						  <div ng-show="!listar">
+							 <div class="panel panel-default panel-info">
+								  <div class="panel-heading">Cadastrar novo treinamento <b>{{ nome_funcionario_selecionado | uppercase }}</b></div>
+								  <div class="panel-body">
+									   <form class="form" name="form_tre" ng-submit="salvarTreinamento(obj_tre)" >
+										  <div class="form-group">
+											<label for="date">Data</label>
+												<input type="text" class="form-control"  ng-required="true" ng-model="obj_tre.month_year" ui-date-mask  id="date" placeholder="09/2015">
+										  </div>
+										  <div class="form-group ">
+											<label for="description">Descrição</label>
+											<input type="text" class="form-control"  ng-required="true" ng-model="obj_tre.description" size="30" id="description" placeholder="Descrição do Treinamento">
+										  </div>
+										   <div class="form-group">
+											<label for="value">Valor</label>
+											<input type="text" class="form-control" ng-required="true" size="5" ng-model="obj_tre.value" ui-number-mask id="value" placeholder="R$ 200,00">
+										  </div>
+										  <button ng-disabled="form_tre.$invalid" type="submit" class="btn btn-default">Cadastrar</button>
+									  </form>
+									  
+								 </div>
+							</div>     
+						</div>
+                         
+                        <div ng-show="listar" class="panel panel-default panel-info">
+                            <div class="panel-heading">Treinamentos Realizados por <b>{{ nome_funcionario_selecionado | uppercase }}</b></div>
+                            <div class="center">
+                                <img src="img/loading.gif" ng-show="loading" />
+                                <h4 ng-if="treinamentos.length <= 0">Nenhum registro encontrado!</h4>
+                            </div>
+                            <div  ng-if="treinamentos.length > 0" ng-show="!loading" class="panel-body container_scroll_tre">
+                              <table class="table">
+                                    <thead>
+                                        <tr><th>Data</th>
+                                            <th>Descrição</th>
+                                            <th>Valor</th>        
+                                        </tr>
+                                    </thead>    
+                                    <tbody>
+
+                                        <tr ng-repeat="treinamento in treinamentos">
+                                            <td>{{ treinamento.month }}/{{ treinamento.year }}</td>
+                                            <td>{{ treinamento.description }}</td>
+                                            <td>{{ treinamento.value  | currency }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table> 
+                            </div>
+                        </div>
+                       
+                    </div>
+						
+					<div ng-show="codigo_cliente_selecionado" class="col-md-4" >
+						<div class="">
+							  <div class="row center">
+								  <div class="col-md-12" >
+									  <div class="panel panel-primary center">
+										  <div class="panel-heading">Verba Liberada</div>
+										   <div>{{ valorDisponivel  | currency }}</div> 
+									  </div> 
+								  </div>
+
+								  <div class="col-md-12" >
+									  <div class="panel panel-danger center">
+										  <div class="panel-heading">Verba Utilizada</div>
+										<div>{{ valorTotalGastoAno  | currency }}</div>
+									  </div> 
+								  </div>
+
+
+								  <div class="col-md-12" >
+									  <div class="panel panel-info center">
+										  <div class="panel-heading">Verba restante</div>
+										<div>{{ valorDisponivel - valorTotalGastoAno  | currency  }}</div>
+									  </div>
+								  </div>
+							  </div>
+						</div>	
+					</div>		
+                </div> 
+			</div>	
+	 	</div>
+	</div>
+	<!-- CONTENT -->
+	
+	
+	 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+	
+</body>
+</html>	

@@ -1,0 +1,10 @@
+ #btn_dashboard{margin-right: 15px;}
+.btn_action_form{margin-top: 4px; margin-right: 6px;}
+.container_scroll { height: 300px; width: 100%; margin: 0; overflow: auto; }
+.container_scroll_tre { height: px; width: 100%; margin: 0; overflow: auto; }
+.container_scroll tr {cursor: pointer}
+.center{text-align:center}
+.sinais{  font-size: 3em;}
+body{background-image: url(../img/main_bg.jpg)}
+#searchyear{margin-top: 17px;}
+#background_img{position: fixed;bottom: 0px;right: 0px;}
