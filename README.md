@@ -9,12 +9,12 @@ Por fim, deve ser possível cadastrar uma nova despesa para o funcionário.
 ## Baixando pacotes
 
 Para execuçáo do sistema web é necessario instalar os seguintes itens:
-NPM
-Node
-express
-request
-querystring
-body-parser
+NPM 2.2.0
+Node 0.10.33
+express 4.13.3
+request 2.62.0
+querystring 0.2.0
+body-parser 1.14.0
 
 ```
 $ sudo apt-get install node
@@ -54,4 +54,4 @@ Agora execute o servidor node com o seguinte comando.
 $ node backend.js //Voce deve estar no diretorio do arquivo ou passar o caminho completo
 ```
 
-Por fim, abre o arquivo index.html e bom uso.
+Por fim, abra o arquivo index.html no browser de sua preferencia.
